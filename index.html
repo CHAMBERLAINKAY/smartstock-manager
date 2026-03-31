@@ -289,6 +289,11 @@
         const tbody = document.getElementById('inventoryBody');
         tbody.innerHTML = '';
 
+        if (inventory.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No products added yet</td></tr>`;
+    return;
+}
+
         inventory.forEach(item => {
             const isLow = item.stock < item.minStock;
             const rowClass = isLow ? 'row-low-stock' : '';
@@ -322,6 +327,12 @@
     // Load data on start
     renderTable();
     updateSummary();
+
+    document.addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+        addProduct();
+    }
+});
 </script>
 
 </body>
