@@ -185,8 +185,18 @@
 
 <div class="container">
     <h1>SmartStock Manager</h1>
+<p style="color:#666; margin-top:5px;">
+    Track your inventory, avoid stockouts, and stay in control.
+</p>
 
     <!-- Input Form -->
+    <input 
+    type="text" 
+    id="searchInput" 
+    placeholder="Search product..." 
+    style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ccc; border-radius:4px;"
+    onkeyup="renderTable()"
+/>
     <div class="input-section">
         <div class="input-group">
             <label for="prodName">Product Name</label>
@@ -278,6 +288,21 @@
     }
 
     // Save to local storage and update screen
+    function editProduct(id) {
+    const product = inventory.find(item => item.id === id);
+
+    const newName = prompt("Edit product name:", product.name);
+    const newCurrent = prompt("Edit current stock:", product.current);
+    const newMin = prompt("Edit minimum stock:", product.min);
+
+    if (newName !== null && newCurrent !== null && newMin !== null) {
+        product.name = newName;
+        product.current = parseInt(newCurrent);
+        product.min = parseInt(newMin);
+
+        saveAndRender();
+    }
+    }
     function saveAndRender() {
         localStorage.setItem('myInventory', JSON.stringify(inventory));
         renderTable();
@@ -294,7 +319,11 @@
     return;
 }
 
-        inventory.forEach(item => {
+        const search = document.getElementById('searchInput').value.toLowerCase();
+
+inventory
+    .filter(item => item.name.toLowerCase().includes(search))
+    .forEach(item => {
             const isLow = item.stock < item.minStock;
             const rowClass = isLow ? 'row-low-stock' : '';
             const statusText = isLow ? 'Low Stock' : 'In Stock';
@@ -306,7 +335,10 @@
                     <td>${item.stock}</td>
                     <td>${item.minStock}</td>
                     <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                    <td><button class="btn-delete" onclick="deleteProduct(${item.id})">Delete</button></td>
+                    <td>
+    <button onclick="editProduct(${item.id})" style="margin-right:5px;">Edit</button>
+    <button class="btn-delete" onclick="deleteProduct(${item.id})">Delete</button>
+</td>
                 </tr>
             `;
             tbody.innerHTML += row;
